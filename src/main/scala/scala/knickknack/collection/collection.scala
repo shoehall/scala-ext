@@ -9,6 +9,7 @@ package object collection {
                                                  (implicit kt: ClassTag[K], vt: ClassTag[V], ord: Ordering[K] = null) {
     def mapValues[R](f: V => R): Iterator[(K, R)] = iterator.map { case (key, value) => (key, f(value)) }
 
+    // todo: 看下是否能够用Iterator[V]替代Array[V]作为结果, 思路: 1)不能用memory了, 2)K和V需要同时放在Iterator中
     def group: Iterator[(K, Array[V])] = new Iterator[(K, Array[V])] {
       // 结果元素, 会在next使用后还原为None
       private var values: Option[(K, Array[V])] = None
@@ -25,21 +26,32 @@ package object collection {
         while (iterator.hasNext && values.isEmpty) {
           val (newGroup, value) = iterator.next()
 
-          // 一个新组开始了, 此时生成结果元素
-          if (memory_key.nonEmpty && memory_key.get != newGroup) {
-            // 更新结果元素
-            val res = new Array[V](memory_values.length)
+          // 一个新组开始了或者到了结尾了 => 生成结果元素
+          if(iterator.hasNext) {
+            if (memory_key.nonEmpty && memory_key.get != newGroup) {
+              values = Some((memory_key.get, memory_values.toArray))
+              // 清空缓存
+              memory_values.clear()
+            }
+
+            // 更新
+            memory_key = Some(newGroup)
+            memory_values += value
+
+          } else {
+            // 更新
+            memory_key = Some(newGroup)
+            memory_values += value
 
             values = Some((memory_key.get, memory_values.toArray))
-
             // 清空缓存
             memory_values.clear()
           }
 
-          // 更新
-          memory_key = Some(newGroup)
-          memory_values += value
+
+
         }
+
       }
 
       override def hasNext: Boolean = {
@@ -55,7 +67,6 @@ package object collection {
         result
       }
     }
-
 
   }
 

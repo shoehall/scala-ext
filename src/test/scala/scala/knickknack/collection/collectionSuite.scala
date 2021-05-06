@@ -36,4 +36,18 @@ class collectionSuite extends FunSuite {
     }
   }
 
+  test("一个组") {
+    val iterator2 = Array(("A", 1), ("A", 2)).iterator
+    println(iterator2.hasNext)
+    val grouped = iterator2.group
+    println(grouped.hasNext)
+    grouped.foreach {
+      case (key, values) =>
+        println(key, values.mkString(","))
+    }
+
+
+
+  }
+
 }
