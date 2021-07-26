@@ -4,36 +4,109 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>cn.datashoe</groupId>
-    <artifactId>scala-knickknack</artifactId>
-    <version>0.1</version>
+    <groupId>io.github.shoehall</groupId>
+    <artifactId>scala-knickknack-parent</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <developers>
+        <developer>
+            <!--输入在sonatype创建的账户和联系邮箱 -->
+            <name>shoehall</name>
+            <email>shoehall@126.com</email>
+            <organization>scala scala.knickknack</organization>
+            <organizationUrl>null</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/shoehall/scala-scala.knickknack</url>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-
-        <spark.version>2.3.2</spark.version>
-        <!--发版的时候要改成spark2.3.2-->
-        <!-->should also support: 2.0.0, 2.1.0, 2.2.0, 2.3.0, 2.4.0<-->
-
-        <hadoop.version>2.7.3</hadoop.version>
-        <hive.version>1.2.1000.2.4.2.12-1</hive.version>
-        <jackson.version>2.7.0</jackson.version>
-
         <java.version>1.8</java.version>
-        <scala.minor.version>2.11</scala.minor.version>
-        <scala.complete.version>2.11.8</scala.complete.version>
-        <!-- breeze在spark 2.0和spark2.1+中是不一致的 -->
-        <breeze.version>0.12</breeze.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <scala.version>2.11.8</scala.version>
+        <scala.binary.version>2.11</scala.binary.version>
+        <knickknack.version>0.1</knickknack.version>
     </properties>
+
+    <modules>
+        <!--  scala扩展  -->
+        <module>rich-scala</module>
+        <!--  一个基于scala的结构化数据计算库, 融合了spark-DataFrame和pandas的一些特性   -->
+        <module>spandas</module>
+        <!-- scala科学计算的工具 -->
+        <module>sciscala</module>
+        <!-- 应用实例 -->
+        <module>examples</module>
+    </modules>
 
     <dependencies>
         <dependency>
             <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_${scala.minor.version}</artifactId>
+            <artifactId>scalatest_2.11</artifactId>
             <version>2.2.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.scalastyle</groupId>
+                <artifactId>scalastyle-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <configuration>
+                    <verbose>false</verbose>
+                    <includeTestSourceDirectory>false</includeTestSourceDirectory>
+                    <failOnWarning>false</failOnWarning>
+                    <sourceDirectory>${basedir}/src/main/scala</sourceDirectory>
+                    <testSourceDirectory>${basedir}/src/test/scala</testSourceDirectory>
+                    <configLocation>scalastyle-config.xml</configLocation>
+                    <outputFile>${basedir}/target/scalastyle-output.xml</outputFile>
+                    <inputEncoding>${project.build.sourceEncoding}</inputEncoding>
+                    <outputEncoding>${project.reporting.outputEncoding}</outputEncoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.17</version>
+                <configuration>
+                    <failOnViolation>false</failOnViolation>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <sourceDirectories>
+                        <directory>${basedir}/src/main/java</directory>
+                        <directory>${basedir}/src/main/scala</directory>
+                    </sourceDirectories>
+                    <testSourceDirectories>
+                        <directory>${basedir}/src/test/java</directory>
+                    </testSourceDirectories>
+                    <configLocation>dev/checkstyle.xml</configLocation>
+                    <outputFile>${basedir}/target/checkstyle-output.xml</outputFile>
+                    <inputEncoding>${project.build.sourceEncoding}</inputEncoding>
+                    <outputEncoding>${project.reporting.outputEncoding}</outputEncoding>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>8.39</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
 </project>
